@@ -605,7 +605,6 @@ void ActuationController::steering_thread_impl() {
     //     cMsg = new CANMessage(VESC_CURRENT_ID(STEER_VESC_ID), &message[0],
     //                           sizeof(message), CANData, CANExtended);
     //   }
-``
     // } else if (!leftLimitSwitch) {
 
     //   if (vesc_steering_cmd < prev_vesc_steering_cmd) {
