@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <map>
 #include "mbed.h"
 #include "config.hpp"
 
@@ -94,7 +95,7 @@ namespace tritonai::gkc {
     void comm_can_set_pos(uint8_t controller_id, float pos) {
         int32_t send_index = 0;
         uint8_t buffer[4];
-        buffer_append_int32(buffer, (int32_t)(pos * 1000000.0), &send_index);
+        buffer_append_int32(buffer, (int32_t)(-1.0*pos * 1000000.0), &send_index);
         can_transmit_eid(controller_id |
                 ((uint32_t)CAN_PACKET_SET_POS << 8), buffer, send_index);
     }
@@ -161,10 +162,114 @@ namespace tritonai::gkc {
         comm_can_set_rpm(THROTTLE_CAN_ID, speed_to_erpm);
     }
 
-    void comm_can_set_angle(float angle) { // in radians
-        
-        float rad_to_deg = 180.0 / 3.14159265358979323846*angle;
-        std::cout << "Angle to deg: " << (int)(rad_to_deg) << std::endl;
+    /**
+     *
+     * @brief Clamp a value between a minimum and maximum range
+     * This function takes a value and clamps it to a specified range between a
+     * minimum and maximum value.
+     * @tparam T The type of the value to clamp (must be comparable with the <
+     * operator and support assignment)
+     * @param val The value to clamp
+     * @param min The minimum value of the range to clamp to
+     * @param max The maximum value of the range to clamp to
+     * @return The value clamped to the specified range between min and max
+     */
+    template <typename T>
+    constexpr T clamp(const T &val, const T &min, const T &max) {
+        if (val > max) {
+            return max;
+        } else if (val < min) {
+            return min;
+        } else {
+            return val;
+    }
+    }
+
+    /**
+     *
+     * @brief Map a value from one range to another range
+     * This function takes a value from a source range and maps it to a destination
+     * range. The input value is first clamped to the source range between
+     * source_min and source_max. Then, it is linearly interpolated to a value
+     * between 0 and 1, where 0 represents the minimum of the source range and 1
+     * represents the maximum of the source range. This normalized value is then
+     * linearly interpolated to a value between dest_min and dest_max, which
+     * represents the corresponding value in the destination range. The resulting
+     * value is then returned.
+     * @tparam S The type of the input source value to map (must be comparable with
+     * the < operator and support assignment)
+     * @tparam D The type of the mapped output destination value (must support
+     * assignment)
+     * @param source The input value to map to the destination range
+     * @param source_min The minimum value of the source range
+     * @param source_max The maximum value of the source range
+     * @param dest_min The minimum value of the destination range
+     * @param dest_max The maximum value of the destination range
+     * @return The input value mapped to the destination range
+     */
+    template <typename S, typename D>
+    constexpr D map_range(const S &source, const S &source_min, const S &source_max,
+                        const D &dest_min, const D &dest_max) {
+        // Clamp the input value to the source range between source_min and source_max
+        float source_f = clamp<S>(source, source_min, source_max);
+
+        // Normalize the clamped value between 0 and 1 based on its position within
+        // the source range
+        source_f = (source_f - source_min) / (source_max - source_min);
+
+        // Map the normalized value to the destination range
+        return static_cast<D>(source_f * (dest_max - dest_min) + dest_min);
+    }
+
+
+    /**
+     *
+     * @brief Map steering angle to motor angle
+     * This function maps the steering angle in radians to the corresponding motor
+     * angle in radians, based on a predefined lookup table. The lookup table is a
+     * map between motor angles and steering angles, obtained through empirical
+     * measurements of the relationship between the two angles. The function finds
+     * the closest two entries in the map that bound the input steering angle and
+     * linearly interpolates the motor angle between these two entries using the
+     * map_range() function. The resulting motor angle is then returned.
+     *
+     * This look up table is defined in config.hpp as STERING_MAPPTING
+     *
+     * @param steer_angle The steering angle in radians to map to a motor angle
+     * @return The corresponding motor angle in radians
+     */
+    float map_steer2motor(float steer_angle) {
+        // Define the lookup table as a map between motor angles and steering angles
+        std::map<float, float> mapping = STERING_MAPPING;
+
+        // Save sign
+        int sign = steer_angle >= 0 ? 1 : -1;
+
+        // Find the two entries in the map that bound the input steering angle and
+        // linearly interpolate between them
+        for (auto it = mapping.begin(); it != mapping.end(); it++) {
+            if ((std::next(it))->second >= sign * steer_angle) {
+
+            auto returned =
+                sign * map_range<float, float>(sign * steer_angle, it->second,
+                                                std::next(it)->second, it->first,
+                                                std::next(it)->first);
+
+            return returned;
+            }
+        }
+
+        // If the input steering angle is out of bounds of the look-up table, return 0
+        return 0;
+    }
+
+    void comm_can_set_angle(float steer_angle) 
+    { // in radians
+
+        float motor_angle = map_steer2motor(steer_angle);
+        float rad_to_deg = 180.0 / 3.14159265358979323846*motor_angle;
+        std::cout << "Motor angle " << (int)(100*motor_angle) << 
+            " Steer angle: " << (int)(100*steer_angle) << std::endl;
         comm_can_set_pos(STEER_CAN_ID, rad_to_deg);
     }
         

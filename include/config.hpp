@@ -168,7 +168,7 @@
 // 110          29
 
 //(in radians)
-#define STERING_MAPPTING    {{0, 0,},\
+#define STERING_MAPPING    {{0, 0,},\
                             {0.523599, 0.15708,},\
                             {0.872665, 0.20944,},\
                             {1.22173, 0.296706,},\
