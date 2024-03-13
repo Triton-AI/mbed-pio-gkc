@@ -13,8 +13,6 @@ namespace tritonai::gkc {
     CAN can2(CAN2_RX, CAN2_TX, CAN2_BAUDRATE);
 
     static void can_transmit_eid(uint32_t id, const uint8_t *data, uint8_t len) {
-
-        
         CANMessage *cMsg;
         cMsg = new CANMessage(id, data, len, CANData, CANExtended);
 
@@ -161,6 +159,13 @@ namespace tritonai::gkc {
         float speed_to_erpm = speed_ms * motor_poles * gear_ratio / wheel_circumference * 60.0 ;
         // std::cout << "Speed to erpm: " << (int)(speed_to_erpm) << std::endl;
         comm_can_set_rpm(THROTTLE_CAN_ID, speed_to_erpm);
+    }
+
+    void comm_can_set_angle(float angle) { // in radians
+        
+        float rad_to_deg = 180.0 / 3.14159265358979323846*angle;
+        std::cout << "Angle to deg: " << (int)(rad_to_deg) << std::endl;
+        comm_can_set_pos(STEER_CAN_ID, rad_to_deg);
     }
         
 } // namespace tritonai::gkc

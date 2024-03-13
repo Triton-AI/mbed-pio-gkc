@@ -145,7 +145,11 @@
 #define THROTTLE_MAX_REVERSE_SPEED -20.0 // m/s
 #define THROTTLE_MAX_FORWARD_SPEED 20.0 // m/s
 #define RC_MAX_SPEED_FORWARD 20.0 // m/s
-#define RC_MAX_SPEED_REVERSE 5.0 // m/s
+#define RC_MAX_SPEED_REVERSE 1.0 // m/s
+
+// Steering
+#define STEER_CAN_PORT  2 // To which can port should the throttle be sent
+#define STEER_CAN_ID 2    // To which can port should the throttle be sent
 
 // *******
 // Sensors

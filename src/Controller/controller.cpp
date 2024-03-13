@@ -368,8 +368,8 @@ namespace tritonai::gkc
       _actuation.set_brake_cmd(brake);
       return;
     }
-    _actuation.set_throttle_cmd(throttle);
     _actuation.set_steering_cmd(steering);
+    _actuation.set_throttle_cmd(throttle);
     _actuation.set_brake_cmd(brake);
   }
 } // namespace tritonai::gkc

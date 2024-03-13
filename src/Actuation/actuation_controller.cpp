@@ -15,11 +15,11 @@ namespace tritonai::gkc
 
   void ActuationController::set_steering_cmd(float cmd)
   {
-    logger->send_log(LogPacket::Severity::BEBUG, "Setting steering to " + std::to_string(cmd));
+    comm_can_set_angle(cmd);
   }
 
   void ActuationController::set_brake_cmd(float cmd)
   {
-    logger->send_log(LogPacket::Severity::BEBUG, "Setting brake to " + std::to_string(cmd));
+    logger->send_log(LogPacket::Severity::BEBUG, "Braking Not Implemented yet " + std::to_string(cmd));
   }
 } // namespace tritonai::gkc
