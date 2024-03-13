@@ -80,14 +80,7 @@ namespace tritonai::gkc
 
             if(!_receiver.messageAvailable) continue; // Stop if no message available
 
-            bool is_the_same_data = Map.throttle(busData[ELRS_THROTLE]) == _packet.throttle &&
-                Map.steering(busData[ELRS_STEERING]) == _packet.steering;
-
             bool is_all_zero = abs(100*Map.throttle(busData[ELRS_THROTLE])) <= 5 && abs(100*Map.throttle(busData[ELRS_STEERING])) <= 5;
-
-            // Check if the values are the same as the previous ones
-            if (is_the_same_data && !is_all_zero)
-                continue; // Stop if the values are the same
 
             // Stop if the emergency stop is not active
             bool temp_active = Map.is_active(
@@ -128,8 +121,6 @@ namespace tritonai::gkc
             _packet.is_active = temp_active;
 
             _is_ready = true;
-
-            
 
             _packet.publish(*_sub);
         }

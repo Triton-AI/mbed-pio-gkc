@@ -72,7 +72,7 @@
 #define DEFAULT_CONTROLLER_POLL_INTERVAL_MS 1000
 #define DEFAULT_CONTROLLER_POLL_LOST_TOLERANCE_MS 3000
 // How often should the RCCOntroller be checked by watchdog
-#define DEFAULT_RC_CONTROLLER_POLL_INTERVAL_MS 1000
+#define DEFAULT_RC_CONTROLLER_POLL_INTERVAL_MS 100
 #define DEFAULT_RC_CONTROLLER_POLL_LOST_TOLERANCE_MS 3000
 // How often should RC Heartbeat be checked by watchdog
 #define DEFAULT_RC_HEARTBEAT_INTERVAL_MS 100
@@ -138,6 +138,14 @@
 #define RIGHT_LSWITCH PF_0
 #define LEFT_LSWITCH PF_1
 #define ENABLE_LSWITCH      //comment to remove limit switches behaviour
+
+// Throttle
+#define THROTTLE_CAN_PORT  2 // To which can port should the throttle be sent
+#define THROTTLE_CAN_ID 1    // To which can port should the throttle be sent
+#define THROTTLE_MAX_REVERSE_SPEED -20.0 // m/s
+#define THROTTLE_MAX_FORWARD_SPEED 20.0 // m/s
+#define RC_MAX_SPEED_FORWARD 20.0 // m/s
+#define RC_MAX_SPEED_REVERSE 5.0 // m/s
 
 // *******
 // Sensors

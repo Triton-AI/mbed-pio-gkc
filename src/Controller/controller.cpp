@@ -69,9 +69,7 @@ namespace tritonai::gkc
     }
 
     send_log(LogPacket::Severity::FATAL, "RC controller heartbeat lost");
-    _actuation.set_throttle_cmd(new float(0.0));
-    _actuation.set_steering_cmd(new float(0.0));
-    _actuation.set_brake_cmd(new float(0.2));
+    set_actuation_values(0.0, 0.0, 0.2); // Set the actuation values to stop the car (brake at 20% pressure
     emergency_stop();
   }
 
@@ -307,8 +305,14 @@ namespace tritonai::gkc
             "is_active: " + std::to_string(packet.is_active)
     );
 
-    // No problems detected, setting the actuation commands
-    set_actuation_values(packet.throttle, packet.steering, packet.brake);
+    float throttle_speed = 0.0;
+
+    if(packet.throttle > 0.0)
+      throttle_speed = packet.throttle * RC_MAX_SPEED_FORWARD;
+    else if(packet.throttle < 0.0)
+      throttle_speed = packet.throttle * RC_MAX_SPEED_REVERSE; 
+
+    set_actuation_values(throttle_speed, packet.steering, packet.brake);
 
     if(packet.autonomy_mode == AutonomyMode::AUTONOMOUS || packet.autonomy_mode == AutonomyMode::AUTONOMOUS_OVERRIDE)
           _rc_commanding = false; // Clear the RC commanding flag
@@ -359,13 +363,13 @@ namespace tritonai::gkc
   {
     if(get_state() != GkcLifecycle::Active){
       send_log(LogPacket::Severity::INFO, "Controller is not active, ignoring set_actuation_values");
-      _actuation.set_throttle_cmd(new float(0.0));
-      _actuation.set_steering_cmd(new float(0.0));
-      _actuation.set_brake_cmd(new float(brake));
+      _actuation.set_throttle_cmd(0.0);
+      _actuation.set_steering_cmd(0.0);
+      _actuation.set_brake_cmd(brake);
       return;
     }
-    _actuation.set_throttle_cmd(new float(throttle));
-    _actuation.set_steering_cmd(new float(steering));
-    _actuation.set_brake_cmd(new float(brake));
+    _actuation.set_throttle_cmd(throttle);
+    _actuation.set_steering_cmd(steering);
+    _actuation.set_brake_cmd(brake);
   }
 } // namespace tritonai::gkc
