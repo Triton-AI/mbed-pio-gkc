@@ -134,7 +134,7 @@
 // #define STEADY_STATE_CURRENT_MULT 0
 #define STEER_DEADBAND_DEG 0.5 //VESC already has a limit of min ERPM := 600. Enything bellow this is already used as 0.
 #define PID_INTERVAL_MS 10
-#define STEER_VESC_ID 02
+#define STEER_VESC_ID 2
 #define RIGHT_LSWITCH PF_0
 #define LEFT_LSWITCH PF_1
 #define ENABLE_LSWITCH      //comment to remove limit switches behaviour
@@ -145,7 +145,7 @@
 #define THROTTLE_MAX_REVERSE_SPEED -20.0 // m/s
 #define THROTTLE_MAX_FORWARD_SPEED 20.0 // m/s
 #define RC_MAX_SPEED_FORWARD 20.0 // m/s
-#define RC_MAX_SPEED_REVERSE 1.0 // m/s
+#define RC_MAX_SPEED_REVERSE 5.0 // m/s
 
 // Steering
 #define STEER_CAN_PORT  2 // To which can port should the throttle be sent
@@ -178,6 +178,7 @@
                             {1.91986, 0.506145}}; // takes first and last column
 #define MIN__WHEEL_STEER_DEG -20
 #define MAX__WHEEL_STEER_DEG 20
+#define MOTOR_OFFSET -0.45
 
 // *****
 // ESTOP
@@ -197,5 +198,7 @@
 #define ELRS_EMERGENCY_STOP_LEFT 4
 #define ELRS_EMERGENCY_STOP_RIGHT 7
 #define ELRS_TRI_SWITCH_RIGHT 6
+#define ELRS_RATIO_THROTTLE 9
+#define ELRS_HOLD_THROTTLE 8
 
 #endif // CONFIG_HPP_

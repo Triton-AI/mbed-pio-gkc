@@ -266,7 +266,7 @@ namespace tritonai::gkc {
     void comm_can_set_angle(float steer_angle) 
     { // in radians
 
-        float motor_angle = map_steer2motor(steer_angle);
+        float motor_angle = map_steer2motor(steer_angle)+MOTOR_OFFSET;
         float rad_to_deg = 180.0 / 3.14159265358979323846*motor_angle;
         comm_can_set_pos(STEER_CAN_ID, rad_to_deg);
     }
