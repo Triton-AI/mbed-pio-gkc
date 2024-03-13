@@ -266,7 +266,6 @@ namespace tritonai::gkc
       return;
     }
 
-
     if(!packet.is_active && get_state() != GkcLifecycle::Inactive){
       send_log(LogPacket::Severity::FATAL, "RCControlGkcPacket is not active, calling emergency_stop()");
       set_actuation_values(0.0, 0.0, 0.2); // Set the actuation values to stop the car (brake at 20% pressure
