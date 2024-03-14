@@ -16,6 +16,7 @@ public:
   void set_throttle_cmd(float cmd);
   void set_steering_cmd(float cmd);
   void set_brake_cmd(float cmd);
+  void estop();
 
   ILogger *logger;
 

@@ -178,7 +178,7 @@
                             {1.91986, 0.506145}}; // takes first and last column
 #define MIN__WHEEL_STEER_DEG -20
 #define MAX__WHEEL_STEER_DEG 20
-#define MOTOR_OFFSET -0.45
+#define MOTOR_OFFSET -0.31
 
 // *****
 // ESTOP

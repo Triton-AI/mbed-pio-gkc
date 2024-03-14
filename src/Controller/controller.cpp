@@ -268,8 +268,14 @@ namespace tritonai::gkc
 
     if(!packet.is_active && get_state() != GkcLifecycle::Inactive){
       send_log(LogPacket::Severity::FATAL, "RCControlGkcPacket is not active, calling emergency_stop()");
-      set_actuation_values(0.0, 0.0, 0.2); // Set the actuation values to stop the car (brake at 20% pressure
+      set_actuation_values(-1.0, 0.0, 0.2); // Set the actuation values to stop the car (brake at 20% pressure
       emergency_stop();
+      return;
+    }
+
+    if(!packet.is_active && get_state() == GkcLifecycle::Inactive){
+      send_log(LogPacket::Severity::INFO, "Controller transitioning to Inactive");
+      set_actuation_values(0.0, 0.0, 0.2); // Set the actuation values to stop the car (brake at 20% pressure
       return;
     }
 
@@ -294,6 +300,7 @@ namespace tritonai::gkc
 
     if(packet.autonomy_mode == AutonomyMode::AUTONOMOUS_OVERRIDE || packet.autonomy_mode == AutonomyMode::MANUAL){
       _rc_commanding = true; // Set the RC commanding flag
+      _last_rc_command = std::chrono::steady_clock::now(); // Update the last RC command time
     }
 
     send_log(LogPacket::Severity::INFO, 
@@ -314,8 +321,8 @@ namespace tritonai::gkc
     set_actuation_values(throttle_speed, packet.steering, packet.brake);
 
     if(packet.autonomy_mode == AutonomyMode::AUTONOMOUS || packet.autonomy_mode == AutonomyMode::AUTONOMOUS_OVERRIDE)
-          _rc_commanding = false; // Clear the RC commanding flag
-
+          if((_last_rc_command - std::chrono::steady_clock::now()) > std::chrono::milliseconds(500))
+             _rc_commanding = false; // Clear the RC commanding flag   
   }
 
   // GkcStateMachine API IMPLEMENTATION
@@ -362,9 +369,7 @@ namespace tritonai::gkc
   {
     if(get_state() != GkcLifecycle::Active){
       send_log(LogPacket::Severity::INFO, "Controller is not active, ignoring set_actuation_values");
-      _actuation.set_throttle_cmd(0.0);
-      _actuation.set_steering_cmd(0.0);
-      _actuation.set_brake_cmd(brake);
+      _actuation.estop();
       return;
     }
     _actuation.set_steering_cmd(steering);

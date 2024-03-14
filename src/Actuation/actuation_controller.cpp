@@ -13,6 +13,11 @@ namespace tritonai::gkc
     comm_can_set_speed(cmd);
   }
 
+  void ActuationController::estop()
+  {
+    comm_can_set_current_brake_rel(THROTTLE_CAN_ID, 1.0);
+  }
+
   void ActuationController::set_steering_cmd(float cmd)
   {
     comm_can_set_angle(cmd);

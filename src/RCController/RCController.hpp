@@ -45,8 +45,6 @@ class RCController : public Watchable
     bool _is_ready;
     GkcPacketSubscriber *_sub;
     float current_throttle=0.0;
-    bool throttle_histersis=false;
-    
 };
 
 } // namespace tritonai::gkc

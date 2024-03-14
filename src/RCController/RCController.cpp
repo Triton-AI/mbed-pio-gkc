@@ -104,17 +104,26 @@ namespace tritonai::gkc
             //     " " << (int)(100*busData[8]) <<
             //     std::endl;
 
-            bool is_all_zero = abs(100*Map.throttle(busData[ELRS_THROTLE])) <= 5 && abs(100*Map.throttle(busData[ELRS_STEERING])) <= 5;
-
             // Stop if the emergency stop is not active
             bool temp_active = Map.is_active(
                 busData[ELRS_EMERGENCY_STOP_LEFT],
                 busData[ELRS_EMERGENCY_STOP_RIGHT]
             );
 
-            bool keep_constant_thr = Map.keep_constant_thr(busData[ELRS_HOLD_THROTTLE]);
+            if(!temp_active){
+                _packet.throttle = 0.0;
+                _packet.steering = 0.0;
+                _packet.brake = 0.2;
+                _packet.is_active = temp_active;
+                _packet.publish(*_sub);
+                continue;
+            }
 
-            if(is_all_zero && !keep_constant_thr && !throttle_histersis){
+            bool keep_constant_thr = Map.keep_constant_thr(busData[ELRS_HOLD_THROTTLE]);
+            bool is_all_zero = abs(100*Map.throttle(busData[ELRS_THROTLE])) <= 5 && abs(100*Map.throttle(busData[ELRS_STEERING])) <= 5;
+
+
+            if(is_all_zero && !keep_constant_thr){
                 _packet.throttle = 0.0;
                 _packet.steering = 0.0;
                 _packet.brake = 0.0;
@@ -126,23 +135,7 @@ namespace tritonai::gkc
                 continue;
             }
 
-            // if(temp_active == false && _packet.is_active == false) continue; // Stop if the values are the same
-
-            if(!temp_active){
-                _packet.throttle = 0.0;
-                _packet.steering = 0.0;
-                _packet.brake = 0.2;
-                _packet.is_active = temp_active;
-                _packet.publish(*_sub);
-                continue;
-            }
-
             if(!keep_constant_thr){
-                throttle_histersis = true;
-                current_throttle = Map.throttle(busData[ELRS_THROTLE]);
-            }
-            else if(throttle_histersis){
-                throttle_histersis = false;
                 current_throttle = Map.throttle(busData[ELRS_THROTLE]);
             }
 
