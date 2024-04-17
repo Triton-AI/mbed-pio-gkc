@@ -159,6 +159,7 @@ namespace tritonai::gkc {
         float wheel_circumference = 0.85; // in meters
         float speed_to_erpm = speed_ms * motor_poles * gear_ratio / wheel_circumference * 60.0 ;
         // std::cout << "Speed to erpm: " << (int)(speed_to_erpm) << std::endl;
+        // std::cout << "speed: " << (int)(speed_ms*60*60/1000) << endl;
         comm_can_set_rpm(THROTTLE_CAN_ID, speed_to_erpm);
     }
 
@@ -266,9 +267,30 @@ namespace tritonai::gkc {
     void comm_can_set_angle(float steer_angle) 
     { // in radians
 
-        float motor_angle = map_steer2motor(steer_angle)+MOTOR_OFFSET;
+        float motor_angle = steer_angle*4.0+MOTOR_OFFSET;
         float rad_to_deg = 180.0 / 3.14159265358979323846*motor_angle;
         comm_can_set_pos(STEER_CAN_ID, rad_to_deg);
+    }
+
+    void comm_can_set_brake_position(float brake_position) {
+        if(brake_position<0.0) {
+            brake_position = 0.0;
+        }
+        else if(brake_position>1.0) {
+            brake_position = 1.0;
+        }
+        // Change 0.0 to 1.0 from unsigned int 0 to 2000
+        unsigned int pos = (unsigned int)(brake_position*(MAX_BRAKE_VAL - MIN_BRAKE_VAL)) + MIN_BRAKE_VAL;
+
+        std::cout << "Brake position: " << pos << std::endl;
+
+        static unsigned char buffer[8] = {0x0F, 0x4A, 0x00, 0xC0, 0, 0, 0, 0};
+        
+        buffer[2] = pos & 0xFF;
+        buffer[3] = 0xC0 | ((pos >> 8) & 0x1F);
+
+        can_transmit_eid(BRAKE_CAN_ID, buffer, 8);
+        
     }
         
 } // namespace tritonai::gkc

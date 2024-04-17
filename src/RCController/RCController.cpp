@@ -113,7 +113,7 @@ namespace tritonai::gkc
             if(!temp_active){
                 _packet.throttle = 0.0;
                 _packet.steering = 0.0;
-                _packet.brake = 0.2;
+                _packet.brake = Map.throttle_ratio(busData[ELRS_RATIO_THROTTLE]);
                 _packet.is_active = temp_active;
                 _packet.publish(*_sub);
                 continue;

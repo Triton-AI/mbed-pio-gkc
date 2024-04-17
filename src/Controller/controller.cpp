@@ -19,9 +19,13 @@ namespace tritonai::gkc
     //TODO: (Moises) TEMP
     GkcStateMachine::initialize();
     //TODO: (Moises) TEMP
+    float brake = 0.0;
     
     while(1){
       ThisThread::sleep_for(std::chrono::milliseconds(100));
+      _actuation.set_brake_cmd(fmod(brake, 1.0));
+      brake += 1.0/2600;
+
       _led = !_led;
       packet.rolling_counter++;
       packet.state = get_state();
@@ -69,7 +73,7 @@ namespace tritonai::gkc
     }
 
     send_log(LogPacket::Severity::FATAL, "RC controller heartbeat lost");
-    set_actuation_values(0.0, 0.0, 0.2); // Set the actuation values to stop the car (brake at 20% pressure
+    set_actuation_values(0.0, 0.0, EMERGENCY_BRAKE_PRESSURE); // Set the actuation values to stop the car (brake at 20% pressure
     emergency_stop();
   }
 
@@ -214,6 +218,7 @@ namespace tritonai::gkc
   // TODO: (Moises) Implement the control packet callback, partially done
   void Controller::packet_callback(const ControlGkcPacket &packet)
   {
+    std::cout << "ControlGkcPacket received" << std::endl;
     if(get_state() != GkcLifecycle::Active){
       send_log(LogPacket::Severity::INFO, "Controller is not active, ignoring ControlGkcPacket");
       return;
@@ -268,14 +273,14 @@ namespace tritonai::gkc
 
     if(!packet.is_active && get_state() != GkcLifecycle::Inactive){
       send_log(LogPacket::Severity::FATAL, "RCControlGkcPacket is not active, calling emergency_stop()");
-      set_actuation_values(-1.0, 0.0, 0.2); // Set the actuation values to stop the car (brake at 20% pressure
+      set_actuation_values(-1.0, 0.0, packet.brake); // Set the actuation values to stop the car (brake at 20% pressure
       emergency_stop();
       return;
     }
 
     if(!packet.is_active && get_state() == GkcLifecycle::Inactive){
       send_log(LogPacket::Severity::INFO, "Controller transitioning to Inactive");
-      set_actuation_values(0.0, 0.0, 0.2); // Set the actuation values to stop the car (brake at 20% pressure
+      set_actuation_values(0.0, 0.0, packet.brake); // Set the actuation values to stop the car (brake at 20% pressure
       return;
     }
 
@@ -331,7 +336,7 @@ namespace tritonai::gkc
   {
     send_log(LogPacket::Severity::INFO, "Controller initializing");
     _watchdog.arm(); // Arms the watchdog
-    set_actuation_values(0.0, 0.0, 0.2); // Set the actuation values to stop the car (brake at 20% pressure
+    set_actuation_values(0.0, 0.0, EMERGENCY_BRAKE_PRESSURE); // Set the actuation values to stop the car (brake at 20% pressure
     return StateTransitionResult::SUCCESS;
   }
 
@@ -353,7 +358,7 @@ namespace tritonai::gkc
   StateTransitionResult Controller::on_emergency_stop(const GkcLifecycle &last_state)
   {
     send_log(LogPacket::Severity::INFO, "Controller emergency stopping");
-    set_actuation_values(0.0, 0.0, 0.2); // Set the actuation values to stop the car (brake at 20% pressure
+    set_actuation_values(0.0, 0.0, EMERGENCY_BRAKE_PRESSURE); // Set the actuation values to stop the car (brake at 20% pressure
     return StateTransitionResult::SUCCESS;
   }
 
@@ -361,7 +366,7 @@ namespace tritonai::gkc
   StateTransitionResult Controller::on_reinitialize(const GkcLifecycle &last_state)
   {
     send_log(LogPacket::Severity::INFO, "Controller reinitializing");
-    set_actuation_values(0.0, 0.0, 0.2); // Set the actuation values to stop the car (brake at 20% pressure
+    set_actuation_values(0.0, 0.0, EMERGENCY_BRAKE_PRESSURE); // Set the actuation values to stop the car (brake at 20% pressure
     return StateTransitionResult::SUCCESS;
   }
 
@@ -370,10 +375,11 @@ namespace tritonai::gkc
     if(get_state() != GkcLifecycle::Active){
       send_log(LogPacket::Severity::INFO, "Controller is not active, ignoring set_actuation_values");
       _actuation.estop();
+      _actuation.set_brake_cmd(brake);
       return;
     }
-    _actuation.set_steering_cmd(steering);
-    _actuation.set_throttle_cmd(throttle);
-    _actuation.set_brake_cmd(brake);
+    // _actuation.set_steering_cmd(steering);
+    // _actuation.set_throttle_cmd(throttle);
+    // _actuation.set_brake_cmd(brake);
   }
 } // namespace tritonai::gkc

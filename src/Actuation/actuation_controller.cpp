@@ -25,6 +25,6 @@ namespace tritonai::gkc
 
   void ActuationController::set_brake_cmd(float cmd)
   {
-    logger->send_log(LogPacket::Severity::BEBUG, "Braking Not Implemented yet " + std::to_string(cmd));
+    comm_can_set_brake_position(cmd);
   }
 } // namespace tritonai::gkc

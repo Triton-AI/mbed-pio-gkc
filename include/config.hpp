@@ -99,8 +99,8 @@
 #define THROTTLE_VESC_ID 1
 // Braking
 #define CAN_BRAKE CAN_1 // Which CAN bus to use for brake [CAN_1 | CAN_2]
-#define MAX_BRAKE_VAL 2500
-#define MIN_BRAKE_VAL 1500
+#define MAX_BRAKE_VAL 3000
+#define MIN_BRAKE_VAL 600
 // Steering
 #define CAN_STEER CAN_2 // Which CAN bus to use for steer [CAN_1 | CAN_2]
 #define MAX_STEER_DEG 100.0
@@ -151,6 +151,12 @@
 #define STEER_CAN_PORT  2 // To which can port should the throttle be sent
 #define STEER_CAN_ID 2    // To which can port should the throttle be sent
 
+// Brake
+#define BRAKE_CAN_PORT  1 // To which can port should the throttle be sent
+#define BRAKE_CAN_ID 0x00FF0000    // To which can port should the throttle be sent
+
+#define EMERGENCY_BRAKE_PRESSURE 1.0 // 0.5 bar
+
 // *******
 // Sensors
 // *******
@@ -178,7 +184,7 @@
                             {1.91986, 0.506145}}; // takes first and last column
 #define MIN__WHEEL_STEER_DEG -20
 #define MAX__WHEEL_STEER_DEG 20
-#define MOTOR_OFFSET -0.31
+#define MOTOR_OFFSET 0.3
 
 // *****
 // ESTOP
