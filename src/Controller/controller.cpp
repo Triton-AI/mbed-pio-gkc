@@ -19,12 +19,9 @@ namespace tritonai::gkc
     //TODO: (Moises) TEMP
     GkcStateMachine::initialize();
     //TODO: (Moises) TEMP
-    float brake = 0.0;
     
     while(1){
       ThisThread::sleep_for(std::chrono::milliseconds(100));
-      _actuation.set_brake_cmd(fmod(brake, 1.0));
-      brake += 1.0/2600;
 
       _led = !_led;
       packet.rolling_counter++;
@@ -378,8 +375,8 @@ namespace tritonai::gkc
       _actuation.set_brake_cmd(brake);
       return;
     }
-    // _actuation.set_steering_cmd(steering);
-    // _actuation.set_throttle_cmd(throttle);
-    // _actuation.set_brake_cmd(brake);
+    _actuation.set_steering_cmd(steering);
+    _actuation.set_throttle_cmd(throttle);
+    _actuation.set_brake_cmd(brake);
   }
 } // namespace tritonai::gkc

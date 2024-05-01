@@ -281,9 +281,6 @@ namespace tritonai::gkc {
         }
         // Change 0.0 to 1.0 from unsigned int 0 to 2000
         unsigned int pos = (unsigned int)(brake_position*(MAX_BRAKE_VAL - MIN_BRAKE_VAL)) + MIN_BRAKE_VAL;
-
-        std::cout << "Brake position: " << pos << std::endl;
-
         static unsigned char buffer[8] = {0x0F, 0x4A, 0x00, 0xC0, 0, 0, 0, 0};
         
         buffer[2] = pos & 0xFF;
