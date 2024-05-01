@@ -142,7 +142,7 @@
 // Throttle
 #define THROTTLE_CAN_PORT  2 // To which can port should the throttle be sent
 #define THROTTLE_CAN_ID 1    // To which can port should the throttle be sent
-#define THROTTLE_MAX_REVERSE_SPEED -20.0 // m/s
+#define THROTTLE_MAX_REVERSE_SPEED 20.0 // m/s
 #define THROTTLE_MAX_FORWARD_SPEED 20.0 // m/s
 #define RC_MAX_SPEED_FORWARD 20.0 // m/s
 #define RC_MAX_SPEED_REVERSE 5.0 // m/s

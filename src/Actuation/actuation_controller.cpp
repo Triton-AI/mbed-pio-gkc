@@ -1,6 +1,8 @@
 #include "Actuation/actuation_controller.hpp"
 #include "Tools/logger.hpp"
 #include "Actuation/vesc_can_tools.hpp"
+#include "config.hpp"
+#include <algorithm>
 
 namespace tritonai::gkc
 {
@@ -10,6 +12,7 @@ namespace tritonai::gkc
 
   void ActuationController::set_throttle_cmd(float cmd)
   {
+    cmd = std::max(THROTTLE_MAX_FORWARD_SPEED, std::min(-1.0*THROTTLE_MAX_REVERSE_SPEED, cmd));
     comm_can_set_speed(cmd);
   }
 
