@@ -18,6 +18,15 @@ public:
   void set_brake_cmd(float cmd);
   void estop();
 
+  float clamp(float val) {
+    if (val < -1.0f*THROTTLE_MAX_REVERSE_SPEED)
+      return -1.0f*THROTTLE_MAX_REVERSE_SPEED;
+    else if (val > THROTTLE_MAX_FORWARD_SPEED)
+      return THROTTLE_MAX_FORWARD_SPEED;
+    else
+      return val;
+  }
+
   ILogger *logger;
 
 };
