@@ -16,13 +16,13 @@ public:
   void set_throttle_cmd(float cmd);
   void set_steering_cmd(float cmd);
   void set_brake_cmd(float cmd);
-  void estop();
+  void full_rel_rev_current_brake();
 
-  float clamp(float val) {
-    if (val < -1.0f*THROTTLE_MAX_REVERSE_SPEED)
-      return -1.0f*THROTTLE_MAX_REVERSE_SPEED;
-    else if (val > THROTTLE_MAX_FORWARD_SPEED)
-      return THROTTLE_MAX_FORWARD_SPEED;
+  float clamp(float val, float max, float min) {
+    if (val < min)
+      return min;
+    else if (val > max)
+      return max;
     else
       return val;
   }

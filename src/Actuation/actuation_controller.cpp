@@ -12,11 +12,11 @@ namespace tritonai::gkc
 
   void ActuationController::set_throttle_cmd(float cmd)
   {
-    cmd = ActuationController::clamp(cmd);
+    cmd = ActuationController::clamp(cmd, THROTTLE_MAX_REVERSE_SPEED, -1.0f*THROTTLE_MAX_REVERSE_SPEED);
     comm_can_set_speed(cmd);
   }
 
-  void ActuationController::estop()
+  void ActuationController::full_rel_rev_current_brake()
   {
     comm_can_set_current_brake_rel(THROTTLE_CAN_ID, 1.0);
   }

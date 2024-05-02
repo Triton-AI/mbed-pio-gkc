@@ -77,6 +77,7 @@
 // How often should RC Heartbeat be checked by watchdog
 #define DEFAULT_RC_HEARTBEAT_INTERVAL_MS 100
 #define DEFAULT_RC_HEARTBEAT_LOST_TOLERANCE_MS 500
+#define RC_TAKEOVER_INTERVAL_MS 100
 
 
 // *********

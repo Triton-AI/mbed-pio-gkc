@@ -270,7 +270,7 @@ namespace tritonai::gkc
 
     if(!packet.is_active && get_state() != GkcLifecycle::Inactive){
       send_log(LogPacket::Severity::FATAL, "RCControlGkcPacket is not active, calling emergency_stop()");
-      set_actuation_values(-1.0, 0.0, packet.brake); // Set the actuation values to stop the car (brake at 20% pressure
+      set_actuation_values(0.0, 0.0, packet.brake); // Set the actuation values to stop the car (brake at 20% pressure
       emergency_stop();
       return;
     }
@@ -323,7 +323,7 @@ namespace tritonai::gkc
     set_actuation_values(throttle_speed, packet.steering, packet.brake);
 
     if(packet.autonomy_mode == AutonomyMode::AUTONOMOUS || packet.autonomy_mode == AutonomyMode::AUTONOMOUS_OVERRIDE)
-          if((_last_rc_command - std::chrono::steady_clock::now()) > std::chrono::milliseconds(500))
+          if((_last_rc_command - std::chrono::steady_clock::now()) > std::chrono::milliseconds(RC_TAKEOVER_INTERVAL_MS))
              _rc_commanding = false; // Clear the RC commanding flag   
   }
 
@@ -371,8 +371,9 @@ namespace tritonai::gkc
   {
     if(get_state() != GkcLifecycle::Active){
       send_log(LogPacket::Severity::INFO, "Controller is not active, ignoring set_actuation_values");
-      _actuation.estop();
+      _actuation.full_rel_rev_current_brake();
       _actuation.set_brake_cmd(brake);
+      _actuation.set_steering_cmd(0.0);
       return;
     }
     _actuation.set_steering_cmd(steering);
