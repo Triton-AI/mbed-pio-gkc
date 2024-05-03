@@ -120,7 +120,7 @@ namespace tritonai::gkc
             }
 
             bool keep_constant_thr = Map.keep_constant_thr(busData[ELRS_HOLD_THROTTLE]);
-            bool is_all_zero = abs(100*Map.throttle(busData[ELRS_THROTLE])) <= 5 && abs(100*Map.throttle(busData[ELRS_STEERING])) <= 5;
+            bool is_all_zero = abs(100*Map.normalize(busData[ELRS_THROTLE])) <= 5 && abs(100*Map.normalize(busData[ELRS_STEERING])) <= 5;
 
 
             if(is_all_zero && !keep_constant_thr){
