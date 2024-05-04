@@ -121,6 +121,11 @@ namespace tritonai::gkc
                 busData[ELRS_EMERGENCY_STOP_RIGHT]
             );
 
+            ratio_mode = Map.getRatioMode(busData[ELRS_TRI_SWITCH_LEFT]);
+            if (ratio_mode == BRAKE_RATIO) {
+                brake_ratio = Map.throttle_ratio(busData[ELRS_RATIO_THROTTLE]);
+            }
+
             if(!temp_active){
                 _packet.throttle = 0.0;
                 _packet.steering = 0.0;
@@ -133,10 +138,7 @@ namespace tritonai::gkc
             bool keep_constant_thr = Map.keep_constant_thr(busData[ELRS_HOLD_THROTTLE]);
             bool is_all_zero = abs(100*Map.normalize(busData[ELRS_THROTLE])) <= 5 && abs(100*Map.normalize(busData[ELRS_STEERING])) <= 5;
 
-            ratio_mode = Map.getRatioMode(busData[ELRS_TRI_SWITCH_LEFT]);
-            if (ratio_mode == BRAKE_RATIO) {
-                brake_ratio = Map.throttle_ratio(busData[ELRS_RATIO_THROTTLE]);
-            } else if (ratio_mode == THROTTLE_RATIO) {
+            if (ratio_mode == THROTTLE_RATIO) {
                 throttle_ratio = Map.throttle_ratio(busData[ELRS_RATIO_THROTTLE]);
             }
 
