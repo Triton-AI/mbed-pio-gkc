@@ -1,4 +1,5 @@
 #include "RCController/RCController.hpp"
+#include "RCController.hpp"
 #include <iostream>
 #include <string>
 
@@ -77,6 +78,16 @@ namespace tritonai::gkc
         else
             return AUTONOMOUS_OVERRIDE;
     }
+    RatioMode Translation::getRatioMode(int leftTriVal)
+    {
+        double leftTriVal_norm = normalize(leftTriVal);
+        if (leftTriVal_norm < -0.5)
+            return BRAKE_RATIO;
+        else if (leftTriVal_norm > 0.5)
+            return THROTTLE_RATIO;
+        else
+            return EMPTY_RATIO;
+    }
 
     // RCController  
     void RCController::update() 
@@ -113,7 +124,7 @@ namespace tritonai::gkc
             if(!temp_active){
                 _packet.throttle = 0.0;
                 _packet.steering = 0.0;
-                _packet.brake = Map.throttle_ratio(busData[ELRS_RATIO_THROTTLE]);
+                _packet.brake = brake_ratio;
                 _packet.is_active = temp_active;
                 _packet.publish(*_sub);
                 continue;
@@ -122,6 +133,12 @@ namespace tritonai::gkc
             bool keep_constant_thr = Map.keep_constant_thr(busData[ELRS_HOLD_THROTTLE]);
             bool is_all_zero = abs(100*Map.normalize(busData[ELRS_THROTLE])) <= 5 && abs(100*Map.normalize(busData[ELRS_STEERING])) <= 5;
 
+            ratio_mode = Map.getRatioMode(busData[ELRS_TRI_SWITCH_LEFT]);
+            if (ratio_mode == BRAKE_RATIO) {
+                brake_ratio = Map.throttle_ratio(busData[ELRS_RATIO_THROTTLE]);
+            } else if (ratio_mode == THROTTLE_RATIO) {
+                throttle_ratio = Map.throttle_ratio(busData[ELRS_RATIO_THROTTLE]);
+            }
 
             if(is_all_zero && !keep_constant_thr){
                 _packet.throttle = 0.0;
@@ -139,7 +156,8 @@ namespace tritonai::gkc
                 current_throttle = Map.throttle(busData[ELRS_THROTLE]);
             }
 
-            _packet.throttle = current_throttle*Map.throttle_ratio(busData[ELRS_RATIO_THROTTLE]);
+            //_packet.throttle = current_throttle*Map.throttle_ratio(busData[ELRS_RATIO_THROTTLE]);
+            _packet.throttle = current_throttle*throttle_ratio;
             _packet.brake = 0.0; // TODO: (Moises) Implement brake
             _packet.steering = Map.steering(busData[ELRS_STEERING]);
             _packet.autonomy_mode = Map.getAutonomyMode(

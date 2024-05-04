@@ -11,6 +11,12 @@
 namespace tritonai::gkc
 {
 
+enum RatioMode {
+    THROTTLE_RATIO = 0,
+    EMPTY_RATIO = 1,
+    BRAKE_RATIO = 2,
+} ;
+
 struct Translation
 {
     double normalize(int analogValue);
@@ -21,6 +27,7 @@ struct Translation
     double brake(int brakeVal);
     bool is_active(int swith1, int swith2);
     AutonomyMode getAutonomyMode(int rightTriVal);
+    RatioMode getRatioMode(int leftTriVal);
 };
 
 class RCController : public Watchable
@@ -45,6 +52,9 @@ class RCController : public Watchable
     bool _is_ready;
     GkcPacketSubscriber *_sub;
     float current_throttle=0.0;
+    float brake_ratio=0.5;
+    float throttle_ratio=0.0;
+    RatioMode ratio_mode=EMPTY_RATIO;
 };
 
 } // namespace tritonai::gkc
