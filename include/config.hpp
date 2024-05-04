@@ -207,5 +207,6 @@
 #define ELRS_TRI_SWITCH_RIGHT 6
 #define ELRS_RATIO_THROTTLE 9
 #define ELRS_HOLD_THROTTLE 8
+#define ELRS_THRESHOLD 0.05 // Arbitrary value to determine if the RC controller is active 0-100
 
 #endif // CONFIG_HPP_

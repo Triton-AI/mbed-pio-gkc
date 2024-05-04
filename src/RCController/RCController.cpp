@@ -139,7 +139,14 @@ namespace tritonai::gkc
                 current_throttle = Map.throttle(busData[ELRS_THROTLE]);
             }
 
-            _packet.throttle = current_throttle*Map.throttle_ratio(busData[ELRS_RATIO_THROTTLE]);
+            double proposed_throttle = current_throttle*Map.throttle_ratio(busData[ELRS_RATIO_THROTTLE]);
+            if(abs(current_throttle)> ELRS_THRESHOLD && abs(proposed_throttle) > ELRS_THRESHOLD)
+                _packet.throttle = proposed_throttle;
+            else if (abs(current_throttle) > ELRS_THRESHOLD && abs(proposed_throttle) < ELRS_THRESHOLD)      
+                _packet.throttle = ELRS_THRESHOLD;
+            else
+                _packet.throttle = 0.0;
+
             _packet.brake = 0.0; // TODO: (Moises) Implement brake
             _packet.steering = Map.steering(busData[ELRS_STEERING]);
             _packet.autonomy_mode = Map.getAutonomyMode(
