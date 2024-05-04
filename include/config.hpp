@@ -100,7 +100,7 @@
 #define THROTTLE_VESC_ID 1
 // Braking
 #define CAN_BRAKE CAN_1 // Which CAN bus to use for brake [CAN_1 | CAN_2]
-#define MAX_BRAKE_VAL 2500
+#define MAX_BRAKE_VAL 2200
 #define MIN_BRAKE_VAL 600
 // Steering
 #define CAN_STEER CAN_2 // Which CAN bus to use for steer [CAN_1 | CAN_2]
