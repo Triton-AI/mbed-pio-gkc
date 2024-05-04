@@ -156,7 +156,6 @@ namespace tritonai::gkc
                 current_throttle = Map.throttle(busData[ELRS_THROTLE]);
             }
 
-            //_packet.throttle = current_throttle*Map.throttle_ratio(busData[ELRS_RATIO_THROTTLE]);
             _packet.throttle = current_throttle*throttle_ratio;
             _packet.brake = 0.0; // TODO: (Moises) Implement brake
             _packet.steering = Map.steering(busData[ELRS_STEERING]);
